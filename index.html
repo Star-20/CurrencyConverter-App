@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Currency Convertor</title>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="main">
+      <div class="main_content">
+        <h1 class="image">Currency Converter</h1>
+
+        <div class="inputs">
+          <input type="number" placeholder="Amount" id="amount" />
+          <select id="from">
+            <option value="">From</option>
+          </select>
+          <select id="to">
+            <option value="">To</option>
+          </select>
+          <button onclick="convert()">Convert</button>
+        </div>
+
+        <div class="value" id="value">0</div>
+      </div>
+    </div>
+
+    <script>
+      fetchAllCurrencies();
+
+      function fetchAllCurrencies() {
+        fetch(
+          "https://free.currconv.com/api/v7/currencies?apiKey=fa020b83e42480a55f41"
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            let options = "";
+
+            for (const currency in data.results) {
+              options += `<option value='${currency}'>${data.results[currency].currencyName}</option>`;
+            }
+
+            document.getElementById("from").innerHTML += options;
+            document.getElementById("to").innerHTML += options;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+
+      function convert() {
+        let amount = document.getElementById("amount").value;
+        let from = document.getElementById("from").value;
+        let to = document.getElementById("to").value;
+        if (amount !== "" && from !== "" && to !== "") {
+          fetch(
+            `https://free.currconv.com/api/v7/convert?apiKey=fa020b83e42480a55f41&q=${from}_${to}&compact=y`
+          )
+            .then((response) => response.json())
+            .then((data) => {
+              let money = amount * data[`${from}_${to}`].val;
+              document.getElementById("value").innerHTML =
+                money.toFixed(2) + ` ${to}`;
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        } else {
+          console.log("not proper");
+        }
+      }
+    </script>
+  </body>
+</html>
